@@ -9,16 +9,16 @@ function chimerSetup(getMode, setMode) {
         if (date.getSeconds() < 56 ) return null;
         var mode = getMode();
         if (mode === 0) return null;
-        chimer = (date.getSeconds() == 59)?beep5:beep1;
+        chimer = (date.getSeconds() == 59) ? beep5 : beep1;
         switch(mode) {
             case 0:
                 return null;
             case 1:
-                return (date.getMinutes() == 59)?chimer:null;
+                return (date.getMinutes() == 59) ? chimer : null;
             case 2:
-                return ((date.getMinutes()%30) == 29)?chimer:null;
+                return ((date.getMinutes() % 30) == 29) ? chimer : null;
             case 3:
-                return ((date.getMinutes()%15) == 14)?chimer:null;
+                return ((date.getMinutes() % 15) == 14) ? chimer : null;
             case 4:
                 return chimer;
         }
@@ -28,9 +28,11 @@ function chimerSetup(getMode, setMode) {
         mode = Number(newmode);
         setMode(mode);
         for (var i=0; i<5; i++) {
-            var cm = document.getElementById("chimeMode"+i);
-            cm.style.fontWeight = (i==mode)?"bold":"normal";
-            cm.style.backgroundColor = (i==mode)?"rgb(80, 40, 40)":"rgb(40, 40, 40)";
+            var cm = document.getElementById("chimeMode" + i);
+            cm.style.fontWeight =
+                (i==mode) ? "bold" : "normal";
+            cm.style.backgroundColor =
+                (i==mode) ? "rgb(80, 40, 40)" : "rgb(40, 40, 40)";
         }
     }
 
