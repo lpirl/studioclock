@@ -50,7 +50,6 @@ function optionHandlers(clock) {
     oncolor.oninput = function() {
         settings.oncolor = oncolor.value;
         clock.led_on = oncolor.value;
-        chrome.storage.sync.set({oncolor: oncolor.value});
     };
     var offcolor = document.getElementById("offcolor");
     offcolor.value = settings.offcolor;
@@ -58,7 +57,6 @@ function optionHandlers(clock) {
     offcolor.oninput = function() {
         settings.offcolor = offcolor.value;
         clock.led_off = offcolor.value;
-        chrome.storage.sync.set({offcolor: offcolor.value});
     };
     var bgcolor = document.getElementById("bgcolor");
     bgcolor.value = settings.bgcolor;
@@ -66,7 +64,6 @@ function optionHandlers(clock) {
     bgcolor.oninput = function() {
         settings.bgcolor = bgcolor.value;
         clock.background = bgcolor.value;
-        chrome.storage.sync.set({bgcolor: bgcolor.value});
     };
     var autosync = document.getElementById("autosync");
     autosync.checked = settings.autosync;
@@ -74,7 +71,6 @@ function optionHandlers(clock) {
     autosync.onchange = function() {
         settings.autosync = autosync.checked;
         onlinesync(autosync.checked);
-        chrome.storage.sync.set({autosync: autosync.checked});
     };
     var reset = document.getElementById("reset");
     reset.onclick = function() {
@@ -87,7 +83,6 @@ function optionHandlers(clock) {
         clock.led_on = oncolor.value;
         clock.led_off = offcolor.value;
         clock.background = bgcolor.value;
-        chrome.storage.sync.set(settings);
     };
 }
 
@@ -113,16 +108,12 @@ window.addEventListener('resize', function() {
 });
 
 window.addEventListener('load', function() {
-    var i;
     var canvas = document.getElementById("clock");
     resizeCanvas();
     clk = new LEDclock(canvas.getContext("2d"));
-    chrome.storage.sync.get(settings, function(items) {
-        for (i in items) {
-            settings[i] = items[i];
-        }
-        shouldChime = chimerSetup(settings.chimeMode);
-        optionHandlers(clk);
-        update();
-    });
+    shouldChime = chimerSetup(
+        function(){ return settings.chimeMode; },
+        function(mode){ settings.chimeMode = mode; },
+    );
+    update();
 });

@@ -1,12 +1,14 @@
-function chimerSetup(mode) {
-    var beep1 = new Audio();
-    var beep5 = new Audio();
+function chimerSetup(getMode, setMode) {
+    var beep1 = new Audio("assets/beep1.ogg");
+    var beep5 = new Audio("assets/beep5.ogg");
     var chiming = document.getElementById("chiming");
     var chimebtn = document.getElementById("chimebtn");
     var chimesetup = document.getElementById("chimesetup");
 
     function shouldChime(date) {
-        if (date.getSeconds() < 56 || mode === 0) return null;
+        if (date.getSeconds() < 56 ) return null;
+        var mode = getMode();
+        if (mode === 0) return null;
         chimer = (date.getSeconds() == 59)?beep5:beep1;
         switch(mode) {
             case 0:
@@ -24,12 +26,12 @@ function chimerSetup(mode) {
 
     function setChimeMode(newmode) {
         mode = Number(newmode);
+        setMode(mode);
         for (var i=0; i<5; i++) {
             var cm = document.getElementById("chimeMode"+i);
             cm.style.fontWeight = (i==mode)?"bold":"normal";
             cm.style.backgroundColor = (i==mode)?"rgb(80, 40, 40)":"rgb(40, 40, 40)";
         }
-        chrome.storage.sync.set({'chimeMode': mode});
     }
 
     function attachChimeHandler(n){
@@ -37,10 +39,6 @@ function chimerSetup(mode) {
           document.getElementById("chimeMode"+n).onclick = handler;
     }
 
-    beep1.src = "/assets/beep1.ogg";
-    beep1.load();
-    beep5.src = "/assets/beep5.ogg";
-    beep5.load();
     chiming.onmouseover = function() {
         chimebtn.style.visibility = 'visible';
     };
@@ -60,7 +58,7 @@ function chimerSetup(mode) {
         attachChimeHandler(i);
     }
     //Initialize chiming buttons
-    setChimeMode(mode);
+    setChimeMode(getMode());
     //return the shouldChime public function
     return shouldChime;
 }
