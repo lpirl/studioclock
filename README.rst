@@ -1,9 +1,14 @@
-Based on the wonderful `studio clock Chrome app
+Clone of the wonderful `studio clock Chrome app
 <https://chrome.google.com/webstore/detail/studio-clock/eclcdfoccndncapnfnellpcoidmjhckn>`__
 (`repository <https://github.com/oskar456/studioclock.git>`__)
-by `Ondřej Caletka <https://github.com/oskar456>`__.
+by `Ondřej Caletka <https://github.com/oskar456>`__ with the following
+modifications:
 
-* hackability:
+* no Chrome app – now standalone
+
+  * thus, no settings storage
+
+* better hackabilit:
 
   * via `index.html <index.html>`__
   * via ``styles/local.css``
