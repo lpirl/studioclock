@@ -19,3 +19,5 @@ modifications:
 * online synchronization enabled by default
 * menu elements (bottom right and left) hidden by default
   (mouseover to see)
+
+`demo <https://lpirl.github.io/studioclock/>`__
