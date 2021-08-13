@@ -1,3 +1,5 @@
+/* for customizations, consider using ``local.css`` */
+
 :root {
   --foreground-color: #ff0000;
   --background-color: #000000;
@@ -5,11 +7,16 @@
   --led-off-color: #260000;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
 body {
   background-color: var(--background-color);
   color: var(--foreground-color);
-  margin: 0;
-  padding: 0;
   overflow: hidden;
 }
 a {
@@ -18,6 +25,9 @@ a {
 }
 #root-container {
   text-align: center;
+}
+#clock {
+  width: 100%;
 }
 .menu-box {
   border-color: 1px solid var(--foreground-color);

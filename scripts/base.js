@@ -1,3 +1,5 @@
+/* for customizations, consider using ``local.js`` */
+
 'use strict';
 var offset = 0;
 var settings = {
@@ -52,21 +54,21 @@ function optionHandlers(clock) {
     };
     var oncolor = document.getElementById('oncolor');
     oncolor.value = settings.oncolor;
-    clock.led_on = oncolor.value;
+    clock.led_on = settings.oncolor;
     oncolor.oninput = function() {
         settings.oncolor = oncolor.value;
         clock.led_on = oncolor.value;
     };
     var offcolor = document.getElementById('offcolor');
     offcolor.value = settings.offcolor;
-    clock.led_off = offcolor.value;
+    clock.led_off = settings.offcolor;
     offcolor.oninput = function() {
         settings.offcolor = offcolor.value;
         clock.led_off = offcolor.value;
     };
     var bgcolor = document.getElementById('bgcolor');
     bgcolor.value = settings.bgcolor;
-    clock.background = bgcolor.value;
+    clock.background = settings.bgcolor;
     bgcolor.oninput = function() {
         settings.bgcolor = bgcolor.value;
         clock.background = bgcolor.value;
