@@ -2,14 +2,20 @@
 var offset = 0;
 var settings = {
     chimeMode: 0,
-    bgcolor: '#000000',
-    oncolor: '#c80000',
-    offcolor: '#280000',
-    autosync: false
+    bgcolor: getValueFromCssRootVar('--background-color'),
+    oncolor: getValueFromCssRootVar('--led-on-color'),
+    offcolor: getValueFromCssRootVar('--led-off-color'),
+    autosync: true
 };
 var clk;
 var shouldChime = function() { return null; };
 var onlinesync = onlineSync();
+
+function getValueFromCssRootVar(varName) {
+    return getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim();
+}
 
 function resizeCanvas() {
     var viewportWidth = window.innerWidth;
@@ -73,16 +79,8 @@ function optionHandlers(clock) {
         onlinesync(autosync.checked);
     };
     var reset = document.getElementById("reset");
-    reset.onclick = function() {
-        settings.bgcolor = '#000000';
-        settings.oncolor = '#c80000';
-        settings.offcolor = '#280000';
-        oncolor.value = settings.oncolor;
-        offcolor.value = settings.offcolor;
-        bgcolor.value = settings.bgcolor;
-        clock.led_on = oncolor.value;
-        clock.led_off = offcolor.value;
-        clock.background = bgcolor.value;
+    reset.onclick = function(){
+        location.reload()
     };
 }
 
@@ -96,7 +94,6 @@ function update() {
       var to = (ms<900)? (900 - ms):0;
       setTimeout(function (){ch.play();}, to);
     }
-    document.body.style.background = clk.background;
     clk.draw();
 }
 
@@ -115,5 +112,6 @@ window.addEventListener('load', function() {
         function(){ return settings.chimeMode; },
         function(mode){ settings.chimeMode = mode; },
     );
+    optionHandlers(clk);
     update();
 });

@@ -29,10 +29,11 @@ function chimerSetup(getMode, setMode) {
         setMode(mode);
         for (var i=0; i<5; i++) {
             var cm = document.getElementById("chimeMode" + i);
-            cm.style.fontWeight =
-                (i==mode) ? "bold" : "normal";
-            cm.style.backgroundColor =
-                (i==mode) ? "rgb(80, 40, 40)" : "rgb(40, 40, 40)";
+            if (i == mode) {
+                cm.classList.add("active");
+            } else {
+                cm.classList.remove("active");
+            }
         }
     }
 
@@ -41,14 +42,6 @@ function chimerSetup(getMode, setMode) {
           document.getElementById("chimeMode"+n).onclick = handler;
     }
 
-    chiming.onmouseover = function() {
-        chimebtn.style.visibility = 'visible';
-    };
-    chiming.onmouseout = function() {
-        chimebtn.style.visibility = 'hidden';
-    };
-    chiming.onmouseover();
-    setTimeout(chiming.onmouseout, 10000);
     chimebtn.onclick = function(ev) {
         chimesetup.style.visibility = 'visible';
         ev.stopPropagation();
@@ -59,7 +52,7 @@ function chimerSetup(getMode, setMode) {
     for (var i=0; i<5; i++) {
         attachChimeHandler(i);
     }
-    //Initialize chiming buttons
+    //Initialize chiming chimebtnbuttons
     setChimeMode(getMode());
     //return the shouldChime public function
     return shouldChime;

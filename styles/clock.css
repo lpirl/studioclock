@@ -1,21 +1,40 @@
+:root {
+  --foreground-color: #ff0000;
+  --background-color: #000000;
+  --led-on-color: var(--foreground-color);
+  --led-off-color: #260000;
+}
+
 body {
-  background-color: black;
-  color: rgb(200,0,0);
+  background-color: var(--background-color);
+  color: var(--foreground-color);
   margin: 0;
   padding: 0;
+  overflow: hidden;
+}
+a {
+  color: inherit;
+  text-decoration: underline;
+}
+#root-container {
+  text-align: center;
+}
+.menu-box {
+  border-color: 1px solid var(--foreground-color);
+  background-color: var(--background-color);
+}
+.menu-container > a {
+  opacity: 0;
+  text-decoration: none;
+}
+.menu-container > a:hover {
+  opacity: 1;
+  transition: 0;
 }
 #chiming {
   position: absolute;
   bottom:1pt;
   right: 1pt;
-}
-#chiming a {
-  color: rgb(200,0,0);
-  text-decoration: none;
-}
-#chimebtn {
-  visibility: hidden;
-  font-size: 200%;
 }
 #chimesetup {
   visibility: hidden;
@@ -24,7 +43,6 @@ body {
   right: 1pt;
   padding: 5px;
   border: solid;
-  background-color: rgb(20, 20, 20);
   text-align: center;
 }
 #chimesetup h3 {
@@ -35,19 +53,15 @@ body {
   display: inline-block;
   margin: 2pt;
   padding: 5pt;
-  background-color: rgb(40, 40, 40);
-  border-radius: 5pt;
+}
+#chimesetup a.active {
+  color: var(--background-color);
+  background-color: var(--foreground-color);
 }
 #menu {
   position: absolute;
   bottom:1pt;
   left: 1pt;
-  color: rgb(200,0,0);
-  text-decoration: none;
-}
-#menu a {
-  color: rgb(200,0,0);
-  text-decoration: none;
 }
 #menubtn {
   visibility: hidden;
@@ -60,14 +74,14 @@ body {
   left: 1pt;
   padding: 5px;
   border: solid;
-  background-color: rgb(20, 20, 20);
   text-align: left;
 }
 #menupopup h3 {
   margin: 2pt;
 }
 #menupopup input {
-  background-color: rgb(40, 40, 40);
+  border: 1px solid var(--foreground-color);
+  background-color: inherit;
   margin: 2pt;
 }
 #menupopup label {
@@ -75,7 +89,6 @@ body {
   display: inline-block;
   margin: 2pt;
   padding: 5pt;
-  background-color: rgb(40, 40, 40);
   border-radius: 5pt;
 }
 #menupopup a {
@@ -84,6 +97,6 @@ body {
   margin: 2pt;
   padding: 5pt;
   text-align: center;
-  background-color: rgb(40, 40, 40);
+  border-color: var(--foreground-color);
   border-radius: 5pt;
 }
