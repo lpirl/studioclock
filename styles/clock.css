@@ -26,9 +26,6 @@ a {
 #root-container {
   text-align: center;
 }
-#clock {
-  width: 100%;
-}
 .menu-box {
   border-color: 1px solid var(--foreground-color);
   background-color: var(--background-color);
