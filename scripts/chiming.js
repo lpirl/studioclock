@@ -1,9 +1,9 @@
 function chimerSetup(getMode, setMode) {
-    var beep1 = new Audio("assets/beep1.ogg");
-    var beep5 = new Audio("assets/beep5.ogg");
-    var chiming = document.getElementById("chiming");
-    var chimebtn = document.getElementById("chimebtn");
-    var chimesetup = document.getElementById("chimesetup");
+    var beep1 = new Audio('assets/beep1.ogg');
+    var beep5 = new Audio('assets/beep5.ogg');
+    var chiming = document.getElementById('chiming');
+    var chimebtn = document.getElementById('chimebtn');
+    var chimesetup = document.getElementById('chimesetup');
 
     function shouldChime(date) {
         if (date.getSeconds() < 56 ) return null;
@@ -28,18 +28,18 @@ function chimerSetup(getMode, setMode) {
         mode = Number(newmode);
         setMode(mode);
         for (var i=0; i<5; i++) {
-            var cm = document.getElementById("chimeMode" + i);
+            var cm = document.getElementById('chimeMode' + i);
             if (i == mode) {
-                cm.classList.add("active");
+                cm.classList.add('active');
             } else {
-                cm.classList.remove("active");
+                cm.classList.remove('active');
             }
         }
     }
 
     function attachChimeHandler(n){
           var handler = function() { setChimeMode(n); };
-          document.getElementById("chimeMode"+n).onclick = handler;
+          document.getElementById('chimeMode' + n).onclick = handler;
     }
 
     chimebtn.onclick = function(ev) {
