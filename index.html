@@ -1,43 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>studio clock</title>
-  <link href="styles/clock.css" rel="stylesheet" type="text/css" />
-  <link href="styles/local.css" rel="stylesheet" type="text/css" />
-</head>
-<body>
-<div id="root-container">
-  <canvas id="clock"></canvas>
-  <div id="chiming" class="menu-container">
-    <a href="#" id="chimebtn">&#128365;</a>
-    <div id="chimesetup" class="menu-box">
-      <h3>Clock chiming</h3>
-      <a href="#" id="chimeMode0">turned off</a><br/>
-      <a href="#" id="chimeMode1">every hour</a><br/>
-      <a href="#" id="chimeMode2">every half hour</a><br/>
-      <a href="#" id="chimeMode3">every quarter hour</a><br/>
-      <a href="#" id="chimeMode4">every minute</a><br/>
-    </div>
-  </div>
-  <div id="menu" class="menu-container">
-    <a href="#" id="menubtn">&#x2261;</a>
-    <div id="menupopup" class="menu-box">
-      <h3>Options</h3>
-      <label><input type="color" id="oncolor"> ON LED</label><br/>
-      <label><input type="color" id="offcolor"> OFF LED</label><br/>
-      <label><input type="color" id="bgcolor"> background</label><br/>
-      <a href="#" id="reset">restore defaults</a><br/>
-      <label><input type="checkbox" id="autosync"> on-line sync</label><br/>
-      <div>current offset: <span id="offset">0</span> ms,<br/>last sync:
-            <span id="syncstatus">N/A</span>
+  <head>
+    <title>studio clock</title>
+    <link href="styles/clock.css" rel="stylesheet" type="text/css" />
+    <link href="styles/local.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="root-container">
+      <canvas id="clock"></canvas>
+      <div id="chiming" class="menu-container">
+        <a href="#" id="chimebtn">&#128365;</a>
+        <div id="chimesetup" class="menu-box">
+          <h3>Clock chiming</h3>
+          <a href="#" id="chimeMode0">turned off</a><br/>
+          <a href="#" id="chimeMode1">every hour</a><br/>
+          <a href="#" id="chimeMode2">every half hour</a><br/>
+          <a href="#" id="chimeMode3">every quarter hour</a><br/>
+          <a href="#" id="chimeMode4">every minute</a><br/>
+        </div>
+      </div>
+      <div id="menu" class="menu-container">
+        <a href="#" id="menubtn">&#x2261;</a>
+        <div id="menupopup" class="menu-box">
+          <h3>Options</h3>
+          <label>
+            <input type="color" id="oncolor"> ON LED</label><br/>
+          <label>
+            <input type="color" id="offcolor"> OFF LED</label><br/>
+          <label>
+            <input type="color" id="bgcolor"> background</label><br/>
+          <a href="#" id="reset">restore defaults</a><br/>
+          <label>
+            <input type="checkbox" id="autosync"> on-line sync</label><br/>
+          <div>
+            current offset: <span id="offset">0</span> ms,<br/>
+            last sync: <span id="syncstatus">N/A</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-</body>
-<script src="scripts/clock.js"></script>
-<script src="scripts/chiming.js"></script>
-<script src="scripts/sync.js"></script>
-<script src="scripts/base.js"></script>
-<script src="scripts/local.js"></script>
+  </body>
+  <script src="scripts/clock.js"></script>
+  <script src="scripts/chiming.js"></script>
+  <script src="scripts/sync.js"></script>
+  <script src="scripts/base.js"></script>
+  <script src="scripts/local.js"></script>
 </html>
