@@ -117,3 +117,25 @@ window.addEventListener('load', function() {
     optionHandlers(clk);
     update();
 });
+
+(function(){
+    var mouseTimer = null;
+    var cursorVisible = true;
+    function onMouseMove(){
+        if (mouseTimer) {
+            window.clearTimeout(mouseTimer);
+        }
+        if (!cursorVisible) {
+            document.body.style.cursor = 'default';
+            cursorVisible = true;
+        }
+        mouseTimer = window.setTimeout(function() {
+            document.body.style.cursor = 'none';
+            mouseTimer = null;
+            cursorVisible = false;
+        }
+        , 3000);
+    };
+    window.addEventListener('load', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove);
+})();
