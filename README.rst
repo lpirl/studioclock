@@ -8,7 +8,7 @@ modifications:
 
   * thus, no settings storage
 
-* better hackabilit:
+* better hackability:
 
   * via `index.html <index.html>`__
   * via ``styles/local.css``
