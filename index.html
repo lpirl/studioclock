@@ -31,6 +31,9 @@
             <input type="color" id="bgcolor"> background</label><br/>
           <a href="#" id="reset">restore defaults</a><br/>
           <label>
+            click to upload custom logo<br/>
+            <input type="file" id="logo" accept="image/*"></label><br/>
+          <label>
             <input type="checkbox" id="autosync"> on-line sync</label><br/>
           <div>
             current offset: <span id="offset">0</span> ms,<br/>
@@ -38,6 +41,7 @@
           </div>
         </div>
       </div>
+      <img class="logo" src="" alt="custom logo"/>
     </div>
   </body>
   <script src="scripts/clock.js"></script>
