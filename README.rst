@@ -19,5 +19,7 @@ modifications:
 * online synchronization enabled by default
 * menu elements (bottom right and left) hidden by default
   (mouseover to see)
+* added possibility to upload a custom logo image
+* fixes for custom colors
 
 `demo <https://lpirl.github.io/studioclock/>`__
