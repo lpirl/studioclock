@@ -56,6 +56,8 @@ function optionHandlers(clock) {
     oncolor.value = settings.oncolor;
     clock.led_on = settings.oncolor;
     oncolor.oninput = function() {
+        document.documentElement.style.setProperty('--led-on-color',
+                                                   oncolor.value);
         settings.oncolor = oncolor.value;
         clock.led_on = oncolor.value;
     };
@@ -63,6 +65,8 @@ function optionHandlers(clock) {
     offcolor.value = settings.offcolor;
     clock.led_off = settings.offcolor;
     offcolor.oninput = function() {
+        document.documentElement.style.setProperty('--led-off-color',
+                                                   offcolor.value);
         settings.offcolor = offcolor.value;
         clock.led_off = offcolor.value;
     };
@@ -70,6 +74,8 @@ function optionHandlers(clock) {
     bgcolor.value = settings.bgcolor;
     clock.background = settings.bgcolor;
     bgcolor.oninput = function() {
+        document.documentElement.style.setProperty('--background-color',
+                                                   bgcolor.value);
         settings.bgcolor = bgcolor.value;
         clock.background = bgcolor.value;
     };
