@@ -79,6 +79,18 @@ function optionHandlers(clock) {
         settings.bgcolor = bgcolor.value;
         clock.background = bgcolor.value;
     };
+    const logoImgs = document.getElementsByClassName('logo');
+    const logoReader = new FileReader();
+    logoReader.onload = function () {
+        for (let i = 0; i < logoImgs.length; i++) {
+            logoImgs[i].src = logoReader.result;
+            logoImgs[i].style.visibility = 'visible';
+        }
+    }
+    var logoInput = document.getElementById('logo');
+    logoInput.oninput = function() {
+        logoReader.readAsDataURL(logo.files[0]);
+    };
     var autosync = document.getElementById('autosync');
     autosync.checked = settings.autosync;
     onlinesync(autosync.checked);

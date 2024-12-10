@@ -24,6 +24,7 @@ a {
   text-decoration: underline;
 }
 #root-container {
+  position: relative;
   text-align: center;
 }
 .menu-box {
@@ -86,7 +87,11 @@ a {
 #menupopup h3 {
   margin: 2pt;
 }
-#menupopup input {
+input[type="file"] {
+  display: none;
+}
+#menupopup input,
+#menupopup label:has(input[type="file"]) {
   border: 1px solid var(--foreground-color);
   background-color: inherit;
   margin: 2pt;
@@ -106,4 +111,12 @@ a {
   text-align: center;
   border-color: var(--foreground-color);
   border-radius: 5pt;
+}
+img.logo {
+  visibility: hidden;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  height: 20%;
+  transform: translateX(-50%) translateY(-50%);
 }
