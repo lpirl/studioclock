@@ -117,6 +117,7 @@ img.logo {
   position: absolute;
   top: 25%;
   left: 50%;
-  height: 20%;
+  min-height: 15%;
+  max-width: 40%;
   transform: translateX(-50%) translateY(-50%);
 }
