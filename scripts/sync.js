@@ -39,7 +39,7 @@ function onlineSync() {
                 console.log("Sync "+(success?"success":"failure")+", offset "+offset+" ms");
                 //repeat every hour on success, 5 minutes on failure
                 if (synctimer === null) {
-                    console.log("setting timer");
+                    console.log("setting sync timer");
                     synctimer = setTimeout(function() {
                         synctimer = null;
                         dosync();
