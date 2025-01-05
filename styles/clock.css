@@ -39,12 +39,15 @@ a {
   opacity: 1;
   transition: 0;
 }
-#chiming {
+#sound {
   position: fixed;
   bottom:1pt;
   right: 1pt;
 }
-#chimesetup {
+#soundbtn {
+  font-size: 2rem;
+}
+#soundsetup {
   visibility: hidden;
   position: absolute;
   bottom: 1pt;
@@ -53,16 +56,16 @@ a {
   border: solid;
   text-align: center;
 }
-#chimesetup h3 {
+#soundsetup h3 {
   margin: 0;
 }
-#chimesetup a {
+#soundsetup a {
   width: 10em;
   display: inline-block;
   margin: 2pt;
   padding: 5pt;
 }
-#chimesetup a.active {
+#soundsetup a.active {
   color: var(--background-color);
   background-color: var(--foreground-color);
 }

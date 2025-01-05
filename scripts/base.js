@@ -3,14 +3,14 @@
 'use strict';
 var offset = 0;
 var settings = {
-    chimeMode: 0,
+    soundMode: 0,
     bgcolor: getValueFromCssRootVar('--background-color'),
     oncolor: getValueFromCssRootVar('--led-on-color'),
     offcolor: getValueFromCssRootVar('--led-off-color'),
     autosync: true
 };
 var clk;
-var shouldChime = function() { return null; };
+var shouldSound = function() { return null; };
 var onlinesync = onlineSync();
 
 function getValueFromCssRootVar(varName) {
@@ -109,7 +109,7 @@ function update() {
     clk.time = new Date(localnow + offset);
     var ms = clk.time.getMilliseconds();
     setTimeout(update, 1000 - ms);
-    var ch = shouldChime(clk.time);
+    var ch = shouldSound(clk.time);
     if (ch !== null ) {
       var to = (ms<900)? (900 - ms):0;
       setTimeout(function (){ ch.play(); }, to);
@@ -128,9 +128,9 @@ window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
     resizeCanvas();
     clk = new LEDclock(canvas.getContext('2d'));
-    shouldChime = chimerSetup(
-        function(){ return settings.chimeMode; },
-        function(mode){ settings.chimeMode = mode; },
+    shouldSound = soundrSetup(
+        function(){ return settings.soundMode; },
+        function(mode){ settings.soundMode = mode; },
     );
     optionHandlers(clk);
     update();
