@@ -35,16 +35,10 @@ function onlineSync() {
                 document.getElementById('offset').innerHTML =
                     offset.toLocaleString();
                 document.getElementById('syncstatus').innerHTML =
-                    success?"success":"failure";
-                console.log("Sync "+(success?"success":"failure")+", offset "+offset+" ms");
+                    success?new Date().toString().slice(4, 24):"failed";
                 //repeat every hour on success, 5 minutes on failure
-                if (synctimer === null) {
-                    console.log("setting sync timer");
-                    synctimer = setTimeout(function() {
-                        synctimer = null;
-                        dosync();
-                    }, success?3600000:300000);
-                }
+                console.log("setting sync timer");
+                synctimer = setTimeout(dosync, 1000 * 60 * 5);
             });
         });
     }
