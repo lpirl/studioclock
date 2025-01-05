@@ -3,7 +3,7 @@
 'use strict';
 var offset = 0;
 var settings = {
-    soundMode: 0,
+    soundInterval: 0,
     bgcolor: getValueFromCssRootVar('--background-color'),
     oncolor: getValueFromCssRootVar('--led-on-color'),
     offcolor: getValueFromCssRootVar('--led-off-color'),
@@ -128,9 +128,9 @@ window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
     resizeCanvas();
     clk = new LEDclock(canvas.getContext('2d'));
-    shouldSound = soundrSetup(
-        function(){ return settings.soundMode; },
-        function(mode){ settings.soundMode = mode; },
+    shouldSound = soundSetup(
+        function(){ return settings.soundInterval; },
+        function(interval){ settings.soundInterval = interval; },
     );
     optionHandlers(clk);
     update();

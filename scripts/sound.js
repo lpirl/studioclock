@@ -1,5 +1,5 @@
-function soundSetup(getMode, setMode) {
-    const soundModes = [
+function soundSetup(getInterval, setInterval) {
+    const soundIntervals = [
       'Off',
       'Hour',
       'HalfHour',
@@ -14,10 +14,10 @@ function soundSetup(getMode, setMode) {
 
     function shouldSound(date) {
         if (date.getSeconds() < 56 ) return null;
-        var mode = getMode();
-        if (mode === 0) return null;
+        var interval = getInterval();
+        if (interval === 0) return null;
         sound = (date.getSeconds() == 59) ? beepLong : beepShort;
-        switch(mode) {
+        switch(interval) {
             case 'Off':
                 return null;
             case 'Hour':
@@ -31,13 +31,13 @@ function soundSetup(getMode, setMode) {
         }
     }
 
-    function setsoundMode(newMode) {
-        setMode(newMode);
-        for (let i = 0; i < soundModes.length; i++) {
-            var mode = soundModes[i];
-            var id = 'soundMode' + mode;
+    function setSoundInterval(newInterval) {
+        setInterval(newInterval);
+        for (let i = 0; i < soundIntervals.length; i++) {
+            var interval = soundIntervals[i];
+            var id = 'soundInterval' + interval;
             var el = document.getElementById(id);
-            if (mode == newMode) {
+            if (interval == newInterval) {
                 el.classList.add('active');
             } else {
                 el.classList.remove('active');
@@ -45,9 +45,9 @@ function soundSetup(getMode, setMode) {
         }
     }
 
-    function attachsoundHandler(n){
-          var handler = function() { setsoundMode(n); };
-          document.getElementById('soundMode' + n).onclick = handler;
+    function attachSoundHandler(n){
+          var handler = function() { setSoundInterval(n); };
+          document.getElementById('soundInterval' + n).onclick = handler;
     }
 
     soundbtn.onclick = function(ev) {
@@ -57,11 +57,11 @@ function soundSetup(getMode, setMode) {
     window.addEventListener('click', function() {
         soundsetup.style.visibility = 'hidden';
     });
-    for (let i = 0; i < soundModes.length; i++) {
-        attachsoundHandler(soundModes[i]);
+    for (let i = 0; i < soundIntervals.length; i++) {
+        attachSoundHandler(soundIntervals[i]);
     }
     //Initialize sound soundbtnbuttons
-    setsoundMode(getMode());
+    setSoundInterval(getInterval());
     //return the shouldSound public function
     return shouldSound;
 }
