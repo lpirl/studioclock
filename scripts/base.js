@@ -105,16 +105,10 @@ function optionHandlers(clock) {
 }
 
 function update() {
-    var localnow = new Date().getTime();
-    clk.time = new Date(localnow + offset);
-    var ms = clk.time.getMilliseconds();
-    setTimeout(update, 1000 - ms);
-    var ch = shouldSound(clk.time);
-    if (ch !== null ) {
-      var to = (ms<900)? (900 - ms):0;
-      setTimeout(function (){ ch.play(); }, to);
-    }
+    clk.time = new Date(Date.now() + offset);
+    setTimeout(update, 1000 - clk.time.getMilliseconds());
     clk.draw();
+    try {shouldSound(clk.time).play();} catch {};
 }
 
 window.addEventListener('resize', function() {
