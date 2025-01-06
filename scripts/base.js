@@ -120,14 +120,27 @@ window.addEventListener('resize', function() {
     }
 });
 
-window.addEventListener('dblclick', function() {
-    if (!window.screenTop && !window.screenY) {
-        document.exitFullscreen();
-    }
-    else {
-        document.documentElement.requestFullscreen();
-    }
-});
+function getFullscreenByClickOrTouchHandler(){
+    // attached to click and tap events to detect double-taps as well
+    const maxDelay = 500;
+    let previous = 0;
+    return function detectDoubleClick(event) {
+      const current = Date.now();
+      if (current - previous < maxDelay) {
+        event.preventDefault();
+        if (window.innerHeight == screen.height &&
+            window.innerWidth == screen.width) {
+            document.exitFullscreen();
+        }
+        else {
+            document.documentElement.requestFullscreen();
+        }
+      }
+      previous = current;
+    };
+}
+window.addEventListener('click', getFullscreenByClickOrTouchHandler())
+window.addEventListener('touchend', getFullscreenByClickOrTouchHandler())
 
 window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
