@@ -19,14 +19,16 @@ function getValueFromCssRootVar(varName) {
     .trim();
 }
 
-function resizeCanvas() {
+function resizeHandler() {
     var viewportWidth = window.innerWidth;
     var viewportHeight = window.innerHeight;
-    var diameter = Math.min(viewportWidth, viewportHeight);
-    var canvasdiameter = 1.00 * diameter;
-    var canvas = document.getElementById('clock');
-    canvas.setAttribute('width', canvasdiameter);
-    canvas.setAttribute('height', canvasdiameter);
+    var shorterEdge = Math.min(viewportWidth, viewportHeight);
+    var logoContainer = document.getElementById('logo-container');
+    logoContainer.style.width = shorterEdge + "px";
+    logoContainer.style.height = shorterEdge + "px";
+    var clock = document.getElementById('clock');
+    clock.width = shorterEdge;
+    clock.height = shorterEdge;
 }
 
 function optionHandlers(clock) {
@@ -112,7 +114,7 @@ function update() {
 }
 
 window.addEventListener('resize', function() {
-    resizeCanvas();
+    resizeHandler();
     if (typeof clk !== 'undefined') {
         clk.draw();
     }
@@ -129,7 +131,7 @@ window.addEventListener('dblclick', function() {
 
 window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
-    resizeCanvas();
+    resizeHandler();
     clk = new LEDclock(canvas.getContext('2d'));
     shouldSound = soundSetup(
         function(){ return settings.soundInterval; },
