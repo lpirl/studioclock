@@ -124,6 +124,15 @@ window.addEventListener('resize', function() {
     }
 });
 
+window.addEventListener('dblclick', function() {
+    if (!window.screenTop && !window.screenY) {
+        document.exitFullscreen();
+    }
+    else {
+        document.documentElement.requestFullscreen();
+    }
+});
+
 window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
     resizeCanvas();
