@@ -3,14 +3,15 @@
 'use strict';
 var offset = 0;
 var settings = {
-    soundInterval: 0,
+    soundInterval: 'Off',
+    soundType: 'Beep',
     bgcolor: getValueFromCssRootVar('--background-color'),
     oncolor: getValueFromCssRootVar('--led-on-color'),
     offcolor: getValueFromCssRootVar('--led-off-color'),
     autosync: true
 };
 var clk;
-var shouldSound = function() { return null; };
+var snd;
 var onlinesync = onlineSync();
 
 function getValueFromCssRootVar(varName) {
@@ -106,11 +107,14 @@ function optionHandlers(clock) {
     };
 }
 
-function update() {
-    clk.time = new Date(Date.now() + offset);
-    setTimeout(update, 1000 - clk.time.getMilliseconds());
-    clk.draw();
-    try {shouldSound(clk.time).play();} catch {};
+function tick() {
+    var date = new Date(Date.now() + offset);
+    setTimeout(tick, 1000 - date.getMilliseconds());
+
+    // audio first, because more sensitive to timing
+    setTimeout(function (){ snd.tick(date); }, 0);
+
+    setTimeout(function (){ clk.tick(date); }, 0);
 }
 
 window.addEventListener('resize', function() {
@@ -146,12 +150,14 @@ window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
     resizeHandler();
     clk = new LEDclock(canvas.getContext('2d'));
-    shouldSound = soundSetup(
+    snd = new ClockSound(
         function(){ return settings.soundInterval; },
         function(interval){ settings.soundInterval = interval; },
+        function(){ return settings.soundType; },
+        function(type){ settings.soundType = type; },
     );
     optionHandlers(clk);
-    update();
+    tick();
 });
 
 (function(){

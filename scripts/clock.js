@@ -88,7 +88,7 @@ function LEDclock(context) {
     this.led_on = 'rgb(200,0,0)';
     this.led_off = 'rgb(40,0,0)';
     this.background = 'rgb(0,0,0)';
-    this.time = new Date();
+    this.date = new Date();
 
     function draw_matrix(digit) {
         //Draws a 7x5 dot matrix digit. Origin is the central dot.
@@ -108,13 +108,13 @@ function LEDclock(context) {
         //draw big digits
         ctx.save();
         ctx.translate(-10*that.grid, 0);
-        draw_matrix(0^(that.time.getHours()/10));
+        draw_matrix(0^(that.date.getHours()/10));
         ctx.translate(6*that.grid, 0);
-        draw_matrix(that.time.getHours()%10);
+        draw_matrix(that.date.getHours()%10);
         ctx.translate(8*that.grid, 0);
-        draw_matrix(0^(that.time.getMinutes()/10));
+        draw_matrix(0^(that.date.getMinutes()/10));
         ctx.translate(6*that.grid, 0);
-        draw_matrix(that.time.getMinutes()%10);
+        draw_matrix(that.date.getMinutes()%10);
         ctx.restore();
 
         //draw small digits
@@ -122,9 +122,9 @@ function LEDclock(context) {
         ctx.translate(0, 8*that.grid);
         ctx.scale(0.7, 0.7);
         ctx.translate(-3*that.grid, 0);
-        draw_matrix(0^(that.time.getSeconds()/10));
+        draw_matrix(0^(that.date.getSeconds()/10));
         ctx.translate(6*that.grid, 0);
-        draw_matrix(that.time.getSeconds()%10);
+        draw_matrix(that.date.getSeconds()%10);
         ctx.restore();
 
         //draw central colon
@@ -164,12 +164,12 @@ function LEDclock(context) {
 
         var ledcircle = [];
         for (var i=0; i<60; i++) {
-            ledcircle[i] = ((i <= that.time.getSeconds())? T: F);
+            ledcircle[i] = ((i <= that.date.getSeconds())? T: F);
         }
         draw_radial_leds(15*that.grid, Math.PI/30, ledcircle);
     }
 
-    this.draw = function () {
+    this.draw = function() {
         var width = ctx.canvas.width;
         var height = ctx.canvas.height;
         var diameter = Math.min(width, height);
@@ -188,4 +188,8 @@ function LEDclock(context) {
         ctx.restore();
     };
 
+    this.tick = function(date) {
+      this.date = date;
+      this.draw()
+    };
 }
