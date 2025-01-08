@@ -2,6 +2,7 @@
 
 'use strict';
 var offset = 0;
+const uiTimeout = 5000;
 var settings = {
     soundInterval: 'Off',
     soundType: 'Beep',
@@ -44,7 +45,7 @@ function optionHandlers(clock) {
       menubtn.style.visibility = 'hidden';
     };
     menu.onmouseover();
-    setTimeout(menu.onmouseout, 10000);
+    setTimeout(menu.onmouseout, uiTimeout);
     menubtn.onclick = function(ev) {
       menupopup.style.visibility = 'visible';
       ev.stopPropagation();
@@ -105,16 +106,21 @@ function optionHandlers(clock) {
     reset.onclick = function(){
         location.reload()
     };
-}
 
-function tick() {
-    var date = new Date(Date.now() + offset);
-    setTimeout(tick, 1000 - date.getMilliseconds());
+    var sound = document.getElementById('sound');
+    var soundbtn = document.getElementById('soundbtn');
+    var soundpopup = document.getElementById('soundpopup');
 
-    // audio first, because more sensitive to timing
-    setTimeout(function (){ snd.tick(date); }, 0);
+    sound.onmouseover = function() {
+      soundbtn.style.visibility = 'visible';
+    };
+    sound.onmouseout = function() {
+      soundbtn.style.visibility = 'hidden';
+    };
+    sound.onmouseover();
+    setTimeout(sound.onmouseout, uiTimeout);
 
-    setTimeout(function (){ clk.tick(date); }, 0);
+    // move option handling for sound here
 }
 
 window.addEventListener('resize', function() {
@@ -176,7 +182,7 @@ window.addEventListener('load', function() {
             mouseTimer = null;
             cursorVisible = false;
         }
-        , 3000);
+        , uiTimeout);
     };
     window.addEventListener('load', onMouseMove);
     document.addEventListener('mousemove', onMouseMove);

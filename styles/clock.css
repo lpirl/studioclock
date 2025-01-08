@@ -12,6 +12,7 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
+  touch-action: none;
 }
 
 body {
@@ -54,12 +55,7 @@ img.logo {
   background-color: var(--background-color);
 }
 .menu-container > a {
-  opacity: 0;
   text-decoration: none;
-}
-.menu-container > a:hover {
-  opacity: 1;
-  transition: 0;
 }
 #sound {
   position: fixed;
