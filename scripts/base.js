@@ -11,9 +11,9 @@ var settings = {
     offcolor: getValueFromCssRootVar('--led-off-color'),
     autosync: true
 };
+var onlinesync;
 var clk;
 var snd;
-var onlinesync = onlineSync();
 
 function getValueFromCssRootVar(varName) {
     return getComputedStyle(document.documentElement)
@@ -33,7 +33,7 @@ function resizeHandler() {
     clock.height = shorterEdge;
 }
 
-function optionHandlers(clock) {
+function menuHandlers() {
     var menu = document.getElementById('menu');
     var menubtn = document.getElementById('menubtn');
     var menupopup = document.getElementById('menupopup');
@@ -58,30 +58,30 @@ function optionHandlers(clock) {
     };
     var oncolor = document.getElementById('oncolor');
     oncolor.value = settings.oncolor;
-    clock.led_on = settings.oncolor;
+    clk.led_on = settings.oncolor;
     oncolor.oninput = function() {
         document.documentElement.style.setProperty('--led-on-color',
                                                    oncolor.value);
         settings.oncolor = oncolor.value;
-        clock.led_on = oncolor.value;
+        clk.led_on = oncolor.value;
     };
     var offcolor = document.getElementById('offcolor');
     offcolor.value = settings.offcolor;
-    clock.led_off = settings.offcolor;
+    clk.led_off = settings.offcolor;
     offcolor.oninput = function() {
         document.documentElement.style.setProperty('--led-off-color',
                                                    offcolor.value);
         settings.offcolor = offcolor.value;
-        clock.led_off = offcolor.value;
+        clk.led_off = offcolor.value;
     };
     var bgcolor = document.getElementById('bgcolor');
     bgcolor.value = settings.bgcolor;
-    clock.background = settings.bgcolor;
+    clk.background = settings.bgcolor;
     bgcolor.oninput = function() {
         document.documentElement.style.setProperty('--background-color',
                                                    bgcolor.value);
         settings.bgcolor = bgcolor.value;
-        clock.background = bgcolor.value;
+        clk.background = bgcolor.value;
     };
     const logoImgs = document.getElementsByClassName('logo');
     const logoReader = new FileReader();
@@ -152,6 +152,26 @@ function getFullscreenByClickOrTouchHandler(){
 window.addEventListener('click', getFullscreenByClickOrTouchHandler())
 window.addEventListener('touchend', getFullscreenByClickOrTouchHandler())
 
+function syncCallback(newOffset){
+    let statusEl = document.getElementById('syncstatus');
+    switch(newOffset) {
+        case false:
+            offset = 0;
+            statusEl.innerHTML = "off"
+            break;
+        case null:
+            statusEl.innerHTML = "failed"
+            break;
+        default:
+            offset = newOffset;
+            statusEl.innerHTML =
+                new Date(Date.now() + offset).toString().slice(4, 24);
+    }
+    clk.setOffset(offset);
+    snd.setOffset(offset);
+    document.getElementById('offset').innerHTML = offset.toLocaleString();
+}
+
 window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
     resizeHandler();
@@ -162,8 +182,8 @@ window.addEventListener('load', function() {
         function(){ return settings.soundType; },
         function(type){ settings.soundType = type; },
     );
-    optionHandlers(clk);
-    tick();
+    onlinesync = onlineSync(syncCallback);
+    menuHandlers();
 });
 
 (function(){

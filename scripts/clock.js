@@ -85,10 +85,11 @@ function LEDclock(context) {
     var that = this;
     this.radius = 22;
     this.grid = 60;
-    this.led_on = 'rgb(200,0,0)';
-    this.led_off = 'rgb(40,0,0)';
-    this.background = 'rgb(0,0,0)';
+    this.led_on = 'rgba(0, 0, 0, 0)';
+    this.led_off = 'rgba(0, 0, 0, 0)';
+    this.background = 'rgba(0, 0, 0, 0)';
     this.date = new Date();
+    this.offset = 0;
 
     function draw_matrix(digit) {
         //Draws a 7x5 dot matrix digit. Origin is the central dot.
@@ -188,8 +189,14 @@ function LEDclock(context) {
         ctx.restore();
     };
 
-    this.tick = function(date) {
-      this.date = date;
-      this.draw()
+    this.tick = function() {
+      that.date = new Date(Date.now() + that.offset);
+      setTimeout(that.tick, 1000 - that.date.getMilliseconds());
+      that.draw();
+    };
+    this.tick();
+
+    this.setOffset = function(newOffset) {
+      that.offset = newOffset;
     };
 }

@@ -13,16 +13,6 @@ Date.prototype.addMinutes = function(minutes) {
     return this;
 }
 
-Date.prototype.addHours = function(hours) {
-    this.addMinutes(hours * 60);
-    return this;
-}
-
-//~ Date.prototype.setNextMinute = function() {
-    //~ this.clearSeconds().addMinutes(1);
-    //~ return this;
-//~ }
-
 function ClockSound(getInterval, setInterval, getType, setType) {
     const soundIntervals = [
       'Off',
@@ -39,128 +29,118 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     const beepLong = new Audio('assets/beep-long.ogg');
     const soundbtn = document.getElementById('soundbtn');
     const soundsetup = document.getElementById('soundsetup');
-    var date = new Date();
-    var schedule = [];
 
-    function fillScheduleBeep(interval) {
-        //~ switch(date.getSeconds()) {
-            //~ case 57:
-                //~ nextBeep = beepShort;
-                //~ break;
-            //~ case 58:
-                //~ nextBeep = beepShort;
-                //~ break;
-            //~ case 59:
-                //~ nextBeep = beepShort;
-                //~ break;
-            //~ case 00:
-                //~ nextBeep = beepLong;
-                //~ break;
-            //~ default:
-                //~ return;
-        //~ }
-        switch(interval) {
-            case 'Hour':
-                if (date.getMinutes() == 59) {
-                    return nextBeep;
-                }
-                break;
-            case 'HalfHour':
-                if ((date.getMinutes() % 30) == 29) {
-                    return nextBeep;
-                }
-                break;
-            case 'QuarterHour':
-                15-(31%15)
-                if ((date.getMinutes() % 15) == 14) {
-                    return nextBeep;
-                }
-                break;
-            case 'Minute':
-                pushSchedule('beep-short.ogg', 57);
-                pushSchedule('beep-short.ogg', 58);
-                pushSchedule('beep-short.ogg', 59);
-                pushSchedule('beep-long.ogg', 00);
-                break;
-            default:
-                console.error('unexpected interval:', interval);
-        }
+    // go on here and adapt implementation to the following variables:
+    var offset = 0;
+    var scheduleDate = 0;
+    var scheduleTimeout = null;
+    var soundTimeouts = [];
+
+    function newOffsetDate(){
+        return new Date(Date.now() + offset);
     }
 
-    function fillScheduleTalkToPlay(date, interval) {
-        console.log("to do: schedule audio");
-    }
+    this.setOffset = function(newOffset){
+        offset = newOffset;
+        rescheduleSounds();
+    };
 
-    function pushSchedule(path, modSecond, modMinute=null, modHour=null){
-        // mod* parameters schedule to next second/minute/hour that
-        // matches the modulus. E.g., modMinute=15 matches 0, 15, 30, 45.
-        let when = new Date(date);
-        const audioCache = {};
-
-        if (modSecond == 0){
-            modSecond = 60;
+    function rescheduleSounds(){
+        for (let i = 0; i < soundTimeouts.length; i++) {
+            clearTimeout(soundTimeouts.shift());
         }
-        when.addSeconds(modSecond - (when.getSeconds() % modSecond));
+        scheduleSounds();
+    };
 
-        if (modMinute != null) {
-            when.addMinutes(modMinute - (when.getMinutes() % modMinute));
-        }
-
-        if (modHour != null) {
-            when.addHours(modHour - (when.getHours() % modHour));
-        }
-
-        if (!audioCache[path]) {
-            audioCache[path] = new Audio('assets/' + path);
-        }
-
-        schedule.push([when, function(){ audioCache[path].play(); }]);
-    }
-
-    function fillSchedule(){
+    function scheduleSounds(){
         var interval = getInterval();
         if (interval == 'Off') {
             return;
         }
         switch (getType()) {
             case 'Beep':
-                fillScheduleBeep(interval);
+                scheduleBeeps(interval);
                 break;
             case 'Talk':
-                fillScheduleTalk(interval);
+                scheduleTalks(interval);
                 break;
             default:
-                console.error('unexpected type:', type);
+                console.error('unexpected interval type:', type);
         };
     }
 
-    function processSchedule(){
-        while (1) {
-            if (schedule.length == 0) {
-                break;
-            }
-            let delay = date.getTime() - schedule[0][0].getTime();
-            if (delay < 0) {
-                // next item to be played in the future
-                break;
-            }
-            let oldest = schedule.shift();
-            if (delay > 500) {
-                console.warn(
-                    "missed executing", oldest[1], "at", oldest[0]
-                );
-                continue;
-            }
-            oldest[1]();
+    function getPlayable(name){
+        const cache = {};
+        if (!cache[name]) {
+            cache[name] = new Audio('assets/' + name + '.ogg');
         }
+        return function (){ cache[name].play(); };
     };
 
-    this.tick = function(newDate) {
-        date = newDate;
-        if (schedule.length == 0){
-            fillSchedule();
+    function scheduleBeeps(interval) {
+        function _scheduleBeeps(matchMinuteModulo=null){
+            scheduleSound(getPlayable('beep-short'), 57, matchMinuteModulo);
+            scheduleSound(getPlayable('beep-short'), 58, matchMinuteModulo);
+            scheduleSound(getPlayable('beep-short'), 59, matchMinuteModulo);
+            scheduleSound(getPlayable('beep-long'), 00, matchMinuteModulo);
+        };
+        switch(interval) {
+            case 'Hour':
+                _scheduleBeeps(60);
+                break;
+            case 'HalfHour':
+                _scheduleBeeps(30);
+                break;
+            case 'QuarterHour':
+                _scheduleBeeps(15);
+                break;
+            case 'Minute':
+                _scheduleBeeps();
+                break;
+            default:
+                console.error('unexpected interval:', interval);
         }
-        processSchedule();
+    }
+
+    function scheduleTalks(date, interval) {
+        console.log("to do: schedule audio");
+    }
+
+    function scheduleSound(func, matchSecond, matchMinuteModulo=null){
+        let when = newOffsetDate();
+
+        if (matchSecond == 0) {
+            matchSecond = 60;
+        }
+        if (matchSecond < when.getSeconds()) {
+            matchSecond += 60;
+        }
+        when.setSeconds(matchSecond);
+
+        if (matchMinuteModulo != null) {
+            nextMinuteMatch = matchMinuteModulo *
+                Math.floor(when.getMinutes() / matchMinuteModulo + 1);
+            if (nextMinuteMatch == 0) {
+                nextMinuteMatch = 60;
+            }
+            if (nextMinuteMatch < when.getMinutes()) {
+                nextMinuteMatch += 60;
+            }
+            when.setMinutes(nextMinuteMatch)
+        }
+
+        let timeout = when - newOffsetDate();
+        if (timeout < 0) {
+            console.warn('cannot schedule sound for the past, ignoring');
+            return;
+        }
+        soundTimeouts.push(setTimeout(func, timeout));
+
+        if (when > scheduleDate) {
+            clearTimeout(scheduleTimeout);
+            setTimeout(scheduleSounds, timeout);
+            scheduleDate = when;
+        }
     }
 
     function changeOption(setFunc, newVal, allVal, IdPrefix) {
@@ -174,6 +154,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
                 el.classList.remove('active');
             }
         }
+        rescheduleSounds();
     }
 
     for (let i = 0; i < soundIntervals.length; i++) {
@@ -216,4 +197,6 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     // initialize buttons
     changeOption(setInterval, getInterval(), soundIntervals, 'soundInterval');
     changeOption(setType, getType(), soundTypes, 'soundType');
+
+    return this;
 }
