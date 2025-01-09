@@ -57,7 +57,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
             clearTimeout(soundTimeouts.pop());
         }
 
-        let interval = getInterval();
+        const interval = getInterval();
         let beforeMinuteModulo = 0;
         switch(interval) {
             case 'Off':
@@ -107,8 +107,8 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     }
 
     async function scheduleBeeps(beforeMinuteModulo) {
-        let short = await getPlayable('beep-short');
-        let long = await getPlayable('beep-long');
+        const short = await getPlayable('beep-short');
+        const long = await getPlayable('beep-long');
         scheduleSound(short, 57, beforeMinuteModulo);
         scheduleSound(short, 58, beforeMinuteModulo);
         scheduleSound(short, 59, beforeMinuteModulo);
@@ -116,7 +116,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     }
 
     async function scheduleTalks(beforeMinuteModulo) {
-        let digits = newOffsetDate()
+        const digits = newOffsetDate()
             .addMinutes(1)  // future minute to announce
             .toTimeString() // get time in uniform format
             .split(':')     // split by h/m/s separator
@@ -137,7 +137,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
 
 
     function scheduleSound(func, atSecond, beforeMinuteModulo=null){
-        let when = newOffsetDate();
+        const when = newOffsetDate();
 
         when.setSeconds(Math.floor(atSecond));
         when.setMilliseconds(1000 * atSecond % 1000);
@@ -154,7 +154,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
             when.setMinutes(atMinute - 1);
         }
 
-        let timeout = when - newOffsetDate();
+        const timeout = when - newOffsetDate();
         if (timeout < 0) {
             console.warn('cannot schedule sound for the past, ignoring');
             return;
