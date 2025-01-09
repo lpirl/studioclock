@@ -36,7 +36,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
 
     let offset = 0;
     let futuremostDate = 0;
-    let futuremostTimeout = null;
+    let schedulingTimeout = null;
     let soundTimeouts = [];
 
     function newOffsetDate(){
@@ -50,9 +50,11 @@ function ClockSound(getInterval, setInterval, getType, setType) {
 
     function rescheduleSounds(){
 
-        clearTimeout(futuremostTimeout);
+        // cancel what is currently scheduled
+        futuremostDate = 0;
+        clearTimeout(schedulingTimeout);
         for (let i = 0; i < soundTimeouts.length; i++) {
-            clearTimeout(soundTimeouts.shift());
+            clearTimeout(soundTimeouts.pop());
         }
 
         let interval = getInterval();
@@ -68,6 +70,12 @@ function ClockSound(getInterval, setInterval, getType, setType) {
                 break;
             case 'QuarterHour':
                 beforeMinuteModulo = 15;
+                break;
+            case 'TenMinutes':
+                beforeMinuteModulo = 10;
+                break;
+            case 'FiveMinutes':
+                beforeMinuteModulo = 5;
                 break;
             case 'Minute':
                 beforeMinuteModulo = null;
@@ -87,65 +95,44 @@ function ClockSound(getInterval, setInterval, getType, setType) {
         };
     }
 
-    function getAudio(name, readyCallback=function(){}){
-        /* no caching here, because same audio cannot be played with
-         * overlap, which can happen in times with duplicated digits */
-        let audio = new Audio('assets/' + name + '.ogg');
-        audio.addEventListener("loadeddata", function(){
-            readyCallback(audio);
-        });
-    };
-
-    function scheduleBeeps(beforeMinuteModulo) {
-        function scheduleBeep(name, atSecond){
-            getAudio(name, function(audio){
-                scheduleSound(
-                    function(){ audio.play(); },
-                    atSecond,
-                    beforeMinuteModulo
-                )
-
+    async function getPlayable(name) {
+        return new Promise(function(resolve, reject) {
+            let audio = new Audio('assets/' + name + '.ogg');
+            audio.addEventListener("loadeddata", function(){
+                let playable = function(){ audio.play(); };
+                playable.duration = audio.duration;
+                resolve(playable);
             });
-        };
-        scheduleBeep('beep-short', 57);
-        scheduleBeep('beep-short', 58);
-        scheduleBeep('beep-short', 59);
-        scheduleBeep('beep-long', 60);
+        });
     }
 
-    function scheduleTalks(beforeMinuteModulo) {
+    async function scheduleBeeps(beforeMinuteModulo) {
+        let short = await getPlayable('beep-short');
+        let long = await getPlayable('beep-long');
+        scheduleSound(short, 57, beforeMinuteModulo);
+        scheduleSound(short, 58, beforeMinuteModulo);
+        scheduleSound(short, 59, beforeMinuteModulo);
+        scheduleSound(long, 60, beforeMinuteModulo);
+    }
+
+    async function scheduleTalks(beforeMinuteModulo) {
         let digits = newOffsetDate()
             .addMinutes(1)  // future minute to announce
             .toTimeString() // get time in uniform format
             .split(':')     // split by h/m/s separator
             .slice(0, 2)    // get hours and minutes only
             .join('')       // joint to a single string of four digits
-            .split('');     // make an array with four items
+            .split('')      // make an array with four digits as strings
+            .reverse();     // need to be scheduled backwards
 
-        // digits can only be scheduled one after the other, because
-        // metadata must be loaded to get the timing right
-        function scheduleDigits(digits, finishAt){
-            getAudio(digits.pop(), function(audio){
-                finishAt -= audio.duration;
-                scheduleSound(
-                    function(){ audio.play(); },
-                    finishAt,
-                    beforeMinuteModulo
-                );
-                if (digits.length > 0) {
-                    scheduleDigits(digits, finishAt);
-                }
-            });
-        };
-        scheduleDigits(digits, 59.5);
+        finishAt = 59.5;
+        for (let i = 0; i < digits.length; i++) {
+            let playable = await getPlayable(digits[i]);
+            finishAt -= playable.duration;
+            scheduleSound(playable, finishAt, beforeMinuteModulo);
+        }
 
-        getAudio('now', function(audio){
-            scheduleSound(
-                function(){ audio.play(); },
-                60,
-                beforeMinuteModulo
-            );
-        });
+        scheduleSound(await getPlayable('now'), 60, beforeMinuteModulo);
     }
 
 
@@ -175,11 +162,13 @@ function ClockSound(getInterval, setInterval, getType, setType) {
         soundTimeouts.push(setTimeout(func, timeout));
 
         if (when > futuremostDate) {
+            clearTimeout(schedulingTimeout);
             futuremostDate = when;
-            clearTimeout(futuremostTimeout);
-            /* creating a new schedule one second after the former is
-             * enough and disturbs sound playback less */
-            futuremostTimeout = setTimeout(rescheduleSounds, timeout + 1000);
+            /* scheduling the rescheduling one second after the former
+             * is enough for this application, disturbs sound playback
+             * less, and is easier to cancel */
+            schedulingTimeout = setTimeout(rescheduleSounds,
+                                           timeout + 1000);
         }
     }
 
