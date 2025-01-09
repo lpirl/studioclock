@@ -12,39 +12,60 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
+  touch-action: none;
 }
 
 body {
   background-color: var(--background-color);
   color: var(--foreground-color);
   overflow: hidden;
+  display: table;
 }
 a {
   color: inherit;
   text-decoration: underline;
 }
 #root-container {
+  display: table-cell;
   position: relative;
   text-align: center;
+  vertical-align: middle;
+}
+#clock {
+  position: absolute;
+  transform: translateX(-50%);
+}
+#logo-container {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+img.logo {
+  visibility: hidden;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  min-height: 15%;
+  max-width: 33%;
+  transform: translateX(-50%) translateY(-50%);
 }
 .menu-box {
   border-color: 1px solid var(--foreground-color);
   background-color: var(--background-color);
 }
 .menu-container > a {
-  opacity: 0;
   text-decoration: none;
 }
-.menu-container > a:hover {
-  opacity: 1;
-  transition: 0;
-}
-#chiming {
+#sound {
   position: fixed;
   bottom:1pt;
   right: 1pt;
 }
-#chimesetup {
+#soundbtn {
+  font-size: 2rem;
+}
+#soundsetup {
   visibility: hidden;
   position: absolute;
   bottom: 1pt;
@@ -53,16 +74,16 @@ a {
   border: solid;
   text-align: center;
 }
-#chimesetup h3 {
+#soundsetup h3 {
   margin: 0;
 }
-#chimesetup a {
+#soundsetup a {
   width: 10em;
   display: inline-block;
   margin: 2pt;
   padding: 5pt;
 }
-#chimesetup a.active {
+#soundsetup a.active {
   color: var(--background-color);
   background-color: var(--foreground-color);
 }
@@ -111,13 +132,4 @@ input[type="file"] {
   text-align: center;
   border-color: var(--foreground-color);
   border-radius: 5pt;
-}
-img.logo {
-  visibility: hidden;
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  min-height: 15%;
-  max-width: 40%;
-  transform: translateX(-50%) translateY(-50%);
 }

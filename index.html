@@ -8,15 +8,23 @@
   <body>
     <div id="root-container">
       <canvas id="clock"></canvas>
-      <div id="chiming" class="menu-container">
-        <a href="#" id="chimebtn">&#128365;</a>
-        <div id="chimesetup" class="menu-box">
-          <h3>clock chiming</h3>
-          <a href="#" id="chimeMode0">turned off</a><br/>
-          <a href="#" id="chimeMode1">every hour</a><br/>
-          <a href="#" id="chimeMode2">every half hour</a><br/>
-          <a href="#" id="chimeMode3">every quarter hour</a><br/>
-          <a href="#" id="chimeMode4">every minute</a><br/>
+      <div id="logo-container">
+        <img class="logo" src="" alt="custom logo"/>
+      </div>
+      <div id="sound" class="menu-container">
+        <a href="#" id="soundbtn">🕪</a>
+        <div id="soundsetup" class="menu-box">
+          <h3>sound interval</h3>
+          <a href="#" id="soundIntervalOff">turned off</a><br/>
+          <a href="#" id="soundIntervalHour">every hour</a><br/>
+          <a href="#" id="soundIntervalHalfHour">every half hour</a><br/>
+          <a href="#" id="soundIntervalQuarterHour">every quarter hour</a><br/>
+          <a href="#" id="soundIntervalTenMinutes">every 10'</a><br/>
+          <a href="#" id="soundIntervalFiveMinutes">every 5'</a><br/>
+          <a href="#" id="soundIntervalMinute">every minute</a><br/>
+          <h3>sound type</h3>
+          <a href="#" id="soundTypeBeep">beep</a><br/>
+          <a href="#" id="soundTypeTalk">talk</a><br/>
         </div>
       </div>
       <div id="menu" class="menu-container">
@@ -36,16 +44,15 @@
           <label>
             <input type="checkbox" id="autosync"> on-line sync</label><br/>
           <div>
-            current offset: <span id="offset">0</span> ms,<br/>
+            current offset: <span id="offset">0</span> ms<br/>
             last sync: <span id="syncstatus">N/A</span>
           </div>
         </div>
       </div>
-      <img class="logo" src="" alt="custom logo"/>
     </div>
   </body>
   <script src="scripts/clock.js"></script>
-  <script src="scripts/chiming.js"></script>
+  <script src="scripts/sound.js"></script>
   <script src="scripts/sync.js"></script>
   <script src="scripts/base.js"></script>
   <script src="scripts/local.js"></script>

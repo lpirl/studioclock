@@ -2,16 +2,18 @@
 
 'use strict';
 var offset = 0;
+const uiTimeout = 5000;
 var settings = {
-    chimeMode: 0,
+    soundInterval: 'Off',
+    soundType: 'Beep',
     bgcolor: getValueFromCssRootVar('--background-color'),
     oncolor: getValueFromCssRootVar('--led-on-color'),
     offcolor: getValueFromCssRootVar('--led-off-color'),
     autosync: true
 };
+var onlinesync;
 var clk;
-var shouldChime = function() { return null; };
-var onlinesync = onlineSync();
+var snd;
 
 function getValueFromCssRootVar(varName) {
     return getComputedStyle(document.documentElement)
@@ -19,17 +21,19 @@ function getValueFromCssRootVar(varName) {
     .trim();
 }
 
-function resizeCanvas() {
+function resizeHandler() {
     var viewportWidth = window.innerWidth;
     var viewportHeight = window.innerHeight;
-    var diameter = Math.min(viewportWidth, viewportHeight);
-    var canvasdiameter = 1.00 * diameter;
-    var canvas = document.getElementById('clock');
-    canvas.setAttribute('width', canvasdiameter);
-    canvas.setAttribute('height', canvasdiameter);
+    var shorterEdge = Math.min(viewportWidth, viewportHeight);
+    var logoContainer = document.getElementById('logo-container');
+    logoContainer.style.width = shorterEdge + "px";
+    logoContainer.style.height = shorterEdge + "px";
+    var clock = document.getElementById('clock');
+    clock.width = shorterEdge;
+    clock.height = shorterEdge;
 }
 
-function optionHandlers(clock) {
+function menuHandlers() {
     var menu = document.getElementById('menu');
     var menubtn = document.getElementById('menubtn');
     var menupopup = document.getElementById('menupopup');
@@ -41,7 +45,7 @@ function optionHandlers(clock) {
       menubtn.style.visibility = 'hidden';
     };
     menu.onmouseover();
-    setTimeout(menu.onmouseout, 10000);
+    setTimeout(menu.onmouseout, uiTimeout);
     menubtn.onclick = function(ev) {
       menupopup.style.visibility = 'visible';
       ev.stopPropagation();
@@ -54,30 +58,30 @@ function optionHandlers(clock) {
     };
     var oncolor = document.getElementById('oncolor');
     oncolor.value = settings.oncolor;
-    clock.led_on = settings.oncolor;
+    clk.led_on = settings.oncolor;
     oncolor.oninput = function() {
         document.documentElement.style.setProperty('--led-on-color',
                                                    oncolor.value);
         settings.oncolor = oncolor.value;
-        clock.led_on = oncolor.value;
+        clk.led_on = oncolor.value;
     };
     var offcolor = document.getElementById('offcolor');
     offcolor.value = settings.offcolor;
-    clock.led_off = settings.offcolor;
+    clk.led_off = settings.offcolor;
     offcolor.oninput = function() {
         document.documentElement.style.setProperty('--led-off-color',
                                                    offcolor.value);
         settings.offcolor = offcolor.value;
-        clock.led_off = offcolor.value;
+        clk.led_off = offcolor.value;
     };
     var bgcolor = document.getElementById('bgcolor');
     bgcolor.value = settings.bgcolor;
-    clock.background = settings.bgcolor;
+    clk.background = settings.bgcolor;
     bgcolor.oninput = function() {
         document.documentElement.style.setProperty('--background-color',
                                                    bgcolor.value);
         settings.bgcolor = bgcolor.value;
-        clock.background = bgcolor.value;
+        clk.background = bgcolor.value;
     };
     const logoImgs = document.getElementsByClassName('logo');
     const logoReader = new FileReader();
@@ -102,47 +106,84 @@ function optionHandlers(clock) {
     reset.onclick = function(){
         location.reload()
     };
-}
 
-function update() {
-    var localnow = new Date().getTime();
-    clk.time = new Date(localnow + offset);
-    var ms = clk.time.getMilliseconds();
-    setTimeout(update, 1000 - ms);
-    var ch = shouldChime(clk.time);
-    if (ch !== null ) {
-      var to = (ms<900)? (900 - ms):0;
-      setTimeout(function (){ ch.play(); }, to);
-    }
-    clk.draw();
+    var sound = document.getElementById('sound');
+    var soundbtn = document.getElementById('soundbtn');
+    var soundpopup = document.getElementById('soundpopup');
+
+    sound.onmouseover = function() {
+      soundbtn.style.visibility = 'visible';
+    };
+    sound.onmouseout = function() {
+      soundbtn.style.visibility = 'hidden';
+    };
+    sound.onmouseover();
+    setTimeout(sound.onmouseout, uiTimeout);
+
+    // move option handling for sound here
 }
 
 window.addEventListener('resize', function() {
-    resizeCanvas();
+    resizeHandler();
     if (typeof clk !== 'undefined') {
         clk.draw();
     }
 });
 
-window.addEventListener('dblclick', function() {
-    if (!window.screenTop && !window.screenY) {
-        document.exitFullscreen();
+function getFullscreenByClickOrTouchHandler(){
+    // attached to click and tap events to detect double-taps as well
+    const maxDelay = 500;
+    let previous = 0;
+    return function detectDoubleClick(event) {
+      const current = Date.now();
+      if (current - previous < maxDelay) {
+        event.preventDefault();
+        if (window.innerHeight == screen.height &&
+            window.innerWidth == screen.width) {
+            document.exitFullscreen();
+        }
+        else {
+            document.documentElement.requestFullscreen();
+        }
+      }
+      previous = current;
+    };
+}
+window.addEventListener('click', getFullscreenByClickOrTouchHandler())
+window.addEventListener('touchend', getFullscreenByClickOrTouchHandler())
+
+function syncCallback(newOffset){
+    let statusEl = document.getElementById('syncstatus');
+    switch(newOffset) {
+        case false:
+            offset = 0;
+            statusEl.innerHTML = "off"
+            break;
+        case null:
+            statusEl.innerHTML = "failed"
+            break;
+        default:
+            offset = newOffset;
+            statusEl.innerHTML =
+                new Date(Date.now() + offset).toString().slice(4, 24);
     }
-    else {
-        document.documentElement.requestFullscreen();
-    }
-});
+    clk.setOffset(offset);
+    snd.setOffset(offset);
+    document.getElementById('offset').innerHTML = offset.toLocaleString();
+}
 
 window.addEventListener('load', function() {
     var canvas = document.getElementById('clock');
-    resizeCanvas();
+    resizeHandler();
     clk = new LEDclock(canvas.getContext('2d'));
-    shouldChime = chimerSetup(
-        function(){ return settings.chimeMode; },
-        function(mode){ settings.chimeMode = mode; },
+    snd = new ClockSound(
+        function(){ return settings.soundInterval; },
+        function(interval){ settings.soundInterval = interval; },
+        function(){ return settings.soundType; },
+        function(type){ settings.soundType = type; },
     );
-    optionHandlers(clk);
-    update();
+    onlinesync = onlineSync(syncCallback);
+    menuHandlers();
 });
 
 (function(){
@@ -161,7 +202,7 @@ window.addEventListener('load', function() {
             mouseTimer = null;
             cursorVisible = false;
         }
-        , 3000);
+        , uiTimeout);
     };
     window.addEventListener('load', onMouseMove);
     document.addEventListener('mousemove', onMouseMove);

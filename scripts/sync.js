@@ -1,29 +1,27 @@
-function onlineSync() {
+function onlineSync(callback) {
     var synctimer = null;
 
-    function timesync(callback) {
-          var xhr = new XMLHttpRequest();
-          var localEpoch1, localEpoch2, serverEpoch, success;
-          xhr.open("GET", "https://time.doesnotwork.eu/fcgi/date");
-          xhr.onreadystatechange = function() {
-              if (xhr.readyState != 4) {
-                  return;
-              }
-              success = false;
-              if (xhr.status == 200) {
-                  localEpoch2 = new Date().getTime();
-                  serverEpoch = 1000 * Number(xhr.responseText);
-                  success = isFinite(serverEpoch);
-              }
-              if (success) {
-                offset = serverEpoch - localEpoch1 - (localEpoch2-localEpoch1)/2;
-              }
-              if (typeof callback === 'function') {
-                callback(success);
-              }
-          };
-          localEpoch1 = new Date().getTime();
-          xhr.send();
+    function timesync(innerCallback) {
+        var xhr = new XMLHttpRequest();
+        var localEpoch1, localEpoch2, serverEpoch, success;
+        xhr.open("GET", "https://time.doesnotwork.eu/fcgi/date");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) {
+                return;
+            }
+            offset = null;
+            if (xhr.status == 200) {
+                serverEpoch = 1000 * Number(xhr.responseText);
+                if (isFinite(serverEpoch)) {
+                    localEpoch2 = new Date().getTime();
+                    offset = serverEpoch - localEpoch1
+                             - (localEpoch2 - localEpoch1)/2;
+                }
+            }
+            innerCallback(offset);
+        };
+        localEpoch1 = new Date().getTime();
+        xhr.send();
     }
     window.timesync = timesync;
 
@@ -31,22 +29,10 @@ function onlineSync() {
         console.log("Syncing...");
         // repeat twice for better accurancy
         timesync(function(){
-            timesync(function(success){
-                document.getElementById('offset').innerHTML =
-                    offset.toLocaleString();
-                document.getElementById('syncstatus').innerHTML =
-                    success?"success":"failure";
-                console.log("Sync "+(success?"success":"failure")+", offset "+offset+" ms");
-                //repeat every hour on success, 5 minutes on failure
-                if (synctimer === null) {
-                    console.log("setting timer");
-                    synctimer = setTimeout(function() {
-                        synctimer = null;
-                        dosync();
-                    }, success?3600000:300000);
-                }
-            });
+            timesync(callback);
         });
+        console.log("setting sync timer");
+        synctimer = setTimeout(dosync, 1000 * 60 * 5);
     }
     window.dosync = dosync;
 
@@ -72,8 +58,7 @@ function onlineSync() {
             clearTimeout(synctimer);
             synctimer = null;
             offset = 0;
-            document.getElementById('offset').innerHTML =
-                offset.toLocaleString();
+            callback(false);
         }
     }
     return onlinesync;
