@@ -3,8 +3,13 @@ Date.prototype.clearSeconds = function() {
     return this;
 }
 
+Date.prototype.addMillis = function(millis) {
+    this.setTime(this.getTime() + millis);
+    return this;
+}
+
 Date.prototype.addSeconds = function(seconds) {
-    this.setTime(this.getTime() + (seconds * 1000));
+    this.addMillis(seconds * 1000);
     return this;
 }
 
@@ -25,16 +30,14 @@ function ClockSound(getInterval, setInterval, getType, setType) {
       'Beep',
       'Talk',
     ];
-    const beepShort = new Audio('assets/beep-short.ogg');
-    const beepLong = new Audio('assets/beep-long.ogg');
+
     const soundbtn = document.getElementById('soundbtn');
     const soundsetup = document.getElementById('soundsetup');
 
-    // go on here and adapt implementation to the following variables:
-    var offset = 0;
-    var scheduleDate = 0;
-    var scheduleTimeout = null;
-    var soundTimeouts = [];
+    let offset = 0;
+    let futuremostDate = 0;
+    let futuremostTimeout = null;
+    let soundTimeouts = [];
 
     function newOffsetDate(){
         return new Date(Date.now() + offset);
@@ -46,87 +49,122 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     };
 
     function rescheduleSounds(){
+
+        clearTimeout(futuremostTimeout);
         for (let i = 0; i < soundTimeouts.length; i++) {
             clearTimeout(soundTimeouts.shift());
         }
-        scheduleSounds();
-    };
 
-    function scheduleSounds(){
-        var interval = getInterval();
-        if (interval == 'Off') {
-            return;
-        }
-        switch (getType()) {
-            case 'Beep':
-                scheduleBeeps(interval);
-                break;
-            case 'Talk':
-                scheduleTalks(interval);
-                break;
-            default:
-                console.error('unexpected interval type:', type);
-        };
-    }
-
-    function getPlayable(name){
-        const cache = {};
-        if (!cache[name]) {
-            cache[name] = new Audio('assets/' + name + '.ogg');
-        }
-        return function (){ cache[name].play(); };
-    };
-
-    function scheduleBeeps(interval) {
-        function _scheduleBeeps(matchMinuteModulo=null){
-            scheduleSound(getPlayable('beep-short'), 57, matchMinuteModulo);
-            scheduleSound(getPlayable('beep-short'), 58, matchMinuteModulo);
-            scheduleSound(getPlayable('beep-short'), 59, matchMinuteModulo);
-            scheduleSound(getPlayable('beep-long'), 00, matchMinuteModulo);
-        };
+        let interval = getInterval();
+        let beforeMinuteModulo = 0;
         switch(interval) {
+            case 'Off':
+                return;
             case 'Hour':
-                _scheduleBeeps(60);
+                beforeMinuteModulo = 60;
                 break;
             case 'HalfHour':
-                _scheduleBeeps(30);
+                beforeMinuteModulo = 30;
                 break;
             case 'QuarterHour':
-                _scheduleBeeps(15);
+                beforeMinuteModulo = 15;
                 break;
             case 'Minute':
-                _scheduleBeeps();
+                beforeMinuteModulo = null;
                 break;
             default:
                 console.error('unexpected interval:', interval);
         }
+        switch (getType()) {
+            case 'Beep':
+                scheduleBeeps(beforeMinuteModulo);
+                break;
+            case 'Talk':
+                scheduleTalks(beforeMinuteModulo);
+                break;
+            default:
+                console.error('unexpected sound type:', type);
+        };
     }
 
-    function scheduleTalks(date, interval) {
-        console.log("to do: schedule audio");
+    function getAudio(name, readyCallback=function(){}){
+        /* no caching here, because same audio cannot be played with
+         * overlap, which can happen in times with duplicated digits */
+        let audio = new Audio('assets/' + name + '.ogg');
+        audio.addEventListener("loadeddata", function(){
+            readyCallback(audio);
+        });
+    };
+
+    function scheduleBeeps(beforeMinuteModulo) {
+        function scheduleBeep(name, atSecond){
+            getAudio(name, function(audio){
+                scheduleSound(
+                    function(){ audio.play(); },
+                    atSecond,
+                    beforeMinuteModulo
+                )
+
+            });
+        };
+        scheduleBeep('beep-short', 57);
+        scheduleBeep('beep-short', 58);
+        scheduleBeep('beep-short', 59);
+        scheduleBeep('beep-long', 60);
     }
 
-    function scheduleSound(func, matchSecond, matchMinuteModulo=null){
+    function scheduleTalks(beforeMinuteModulo) {
+        let digits = newOffsetDate()
+            .addMinutes(1)  // future minute to announce
+            .toTimeString() // get time in uniform format
+            .split(':')     // split by h/m/s separator
+            .slice(0, 2)    // get hours and minutes only
+            .join('')       // joint to a single string of four digits
+            .split('');     // make an array with four items
+
+        // digits can only be scheduled one after the other, because
+        // metadata must be loaded to get the timing right
+        function scheduleDigits(digits, finishAt){
+            getAudio(digits.pop(), function(audio){
+                finishAt -= audio.duration;
+                scheduleSound(
+                    function(){ audio.play(); },
+                    finishAt,
+                    beforeMinuteModulo
+                );
+                if (digits.length > 0) {
+                    scheduleDigits(digits, finishAt);
+                }
+            });
+        };
+        scheduleDigits(digits, 59.5);
+
+        getAudio('now', function(audio){
+            scheduleSound(
+                function(){ audio.play(); },
+                60,
+                beforeMinuteModulo
+            );
+        });
+    }
+
+
+    function scheduleSound(func, atSecond, beforeMinuteModulo=null){
         let when = newOffsetDate();
 
-        if (matchSecond == 0) {
-            matchSecond = 60;
+        when.setSeconds(Math.floor(atSecond));
+        when.setMilliseconds(1000 * atSecond % 1000);
+        if (when < newOffsetDate()) {
+            when.addMinutes(1);
         }
-        if (matchSecond < when.getSeconds()) {
-            matchSecond += 60;
-        }
-        when.setSeconds(matchSecond);
 
-        if (matchMinuteModulo != null) {
-            nextMinuteMatch = matchMinuteModulo *
-                Math.floor(when.getMinutes() / matchMinuteModulo + 1);
-            if (nextMinuteMatch == 0) {
-                nextMinuteMatch = 60;
+        if (beforeMinuteModulo != null) {
+            atMinute = beforeMinuteModulo *
+                Math.floor(when.getMinutes() / beforeMinuteModulo + 1);
+            if (atMinute == 0) {
+                atMinute = 60;
             }
-            if (nextMinuteMatch < when.getMinutes()) {
-                nextMinuteMatch += 60;
-            }
-            when.setMinutes(nextMinuteMatch)
+            when.setMinutes(atMinute - 1);
         }
 
         let timeout = when - newOffsetDate();
@@ -136,18 +174,20 @@ function ClockSound(getInterval, setInterval, getType, setType) {
         }
         soundTimeouts.push(setTimeout(func, timeout));
 
-        if (when > scheduleDate) {
-            clearTimeout(scheduleTimeout);
-            setTimeout(scheduleSounds, timeout);
-            scheduleDate = when;
+        if (when > futuremostDate) {
+            futuremostDate = when;
+            clearTimeout(futuremostTimeout);
+            /* creating a new schedule one second after the former is
+             * enough and disturbs sound playback less */
+            futuremostTimeout = setTimeout(rescheduleSounds, timeout + 1000);
         }
     }
 
     function changeOption(setFunc, newVal, allVal, IdPrefix) {
         setFunc(newVal);
         for (let i = 0; i < allVal.length; i++) {
-            var val = allVal[i];
-            var el = document.getElementById(IdPrefix + val);
+            let val = allVal[i];
+            let el = document.getElementById(IdPrefix + val);
             if (val == newVal) {
                 el.classList.add('active');
             } else {
@@ -158,7 +198,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     }
 
     for (let i = 0; i < soundIntervals.length; i++) {
-        var interval = soundIntervals[i];
+        let interval = soundIntervals[i];
         document.getElementById(
             'soundInterval' + interval
         ).addEventListener('click', function() {
@@ -172,7 +212,7 @@ function ClockSound(getInterval, setInterval, getType, setType) {
     }
 
     for (let i = 0; i < soundTypes.length; i++) {
-        var type = soundTypes[i];
+        let type = soundTypes[i];
         document.getElementById(
             'soundType' + type
         ).addEventListener('click', function(ev) {
